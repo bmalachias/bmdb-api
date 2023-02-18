@@ -2,10 +2,11 @@ import { Router } from 'express'
 import Movie from '../models/Movie.model.js'
 import Star from '../models/Star.model.js'
 import fileUpload from '../config/cloudinary.config.js'
+import isAuthenticatedMiddleware from '../middlewares/isAuthenticatedMiddleware.js'
 
 const moviesRouter = Router()
 
-moviesRouter.post('/', async (req, res) => {
+moviesRouter.post('/', isAuthenticatedMiddleware, async (req, res) => {
     const payload = req.body
     try {
         const newMovie = await Movie.create(payload)
@@ -19,7 +20,7 @@ moviesRouter.post('/', async (req, res) => {
     }
 })
 
-moviesRouter.get('/', async (req, res) => {
+moviesRouter.get('/', isAuthenticatedMiddleware, async (req, res) => {
     const { year, order } = req.query
     const query = {}
     if(year) {
@@ -35,7 +36,7 @@ moviesRouter.get('/', async (req, res) => {
     }
 })
 
-moviesRouter.get('/:id', async (req, res) => {
+moviesRouter.get('/:id', isAuthenticatedMiddleware, async (req, res) => {
     const { id } = req.params
     try {
         const movie = await Movie.findById(id)
@@ -55,7 +56,7 @@ moviesRouter.get('/:id', async (req, res) => {
         return res.status(500).json({message: "Internal server error"})
     }
 })
-moviesRouter.put('/:id', async (req, res) => {
+moviesRouter.put('/:id', isAuthenticatedMiddleware, async (req, res) => {
     const { id } = req.params
     const payload = req.body
     try {
@@ -72,7 +73,7 @@ moviesRouter.put('/:id', async (req, res) => {
         return res.status(500).json({message: "Internal server error"})
     }
 })
-moviesRouter.delete('/:id', async (req, res) => {
+moviesRouter.delete('/:id', isAuthenticatedMiddleware, async (req, res) => {
     const { id } = req.params
     try {
         await Movie.findOneAndDelete({_id: id})
@@ -82,7 +83,7 @@ moviesRouter.delete('/:id', async (req, res) => {
     }
 })
 
-moviesRouter.post("/upload", fileUpload.single('moviePoster'), (req, res) => {
+moviesRouter.post("/upload", isAuthenticatedMiddleware, fileUpload.single('moviePoster'), (req, res) => {
     res.status(201).json({url: req.file.path})
 })
 
