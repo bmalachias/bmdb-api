@@ -10,10 +10,12 @@ import commentsRouter from './routes/comments.routes.js'
 const app = express()
 connectDb()
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    app.use(cors());
+    next();
+});
 
-app.use(cors({
-    origin: ['http://localhost:3000', process.env.REACT_URL]
-}))
 app.use(express.json())
 app.use('/movies', moviesRouter)
 app.use('/stars', starsRouter)
